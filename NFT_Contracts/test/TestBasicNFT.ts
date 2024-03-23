@@ -16,35 +16,32 @@ describe("NFT Contract", () => {
     console.log("Contract Address ->", nftContractInstance.address);
   });
 
-   it("Checking the NFT Name ",async () => {
-     const expectedName = "NFT";
-     const actualName = await nftContractInstance.name();
-     console.log("ExpectedName ->", expectedName);
-     console.log("ActualName ->", actualName);
-     expect(actualName).to.equal(expectedName);
-   })
+  // Test case for checking the NFT name
+  it("Checks the NFT name", async () => {
+    const expectedName = "NFT";
+    const actualName = await nftContractInstance.name();
+    console.log("Expected Name ->", expectedName);
+    console.log("Actual Name ->", actualName);
+    expect(actualName).to.equal(expectedName);
+  });
 
-   it("Checking the NFT symbol",async () => {
-     const expectedSymbol = "NFTzzz";
-     const actualSymbol = await nftContractInstance.symbol();
-     console.log("ExpectedSymbol ->", expectedSymbol);
-     console.log("ActualSymbol ->", actualSymbol);
-     expect(actualSymbol).to.equal(expectedSymbol);
-   })
+  // Test case for checking the NFT symbol
+  it("Checks the NFT symbol", async () => {
+    const expectedSymbol = "NFTzzz";
+    const actualSymbol = await nftContractInstance.symbol();
+    console.log("Expected Symbol ->", expectedSymbol);
+    console.log("Actual Symbol ->", actualSymbol);
+    expect(actualSymbol).to.equal(expectedSymbol);
+  });
 
   // Test case for minting a NFT
   it("Should mint a NFT", async () => {
-    // URI of the NFT
     const tokenURI = "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jJrMRxu";
-
-    // Mint the NFT
     await nftContractInstance.mintNft(tokenURI);
-    // Get the URI stored in the contract using the token ID
     const storedURI = await nftContractInstance.tokenURI(0);
-    // Print the minted URI and the returned URI in the contract
     console.log("Minted URI ->", tokenURI);
     console.log("Returned URI in Contract using Idx ->", storedURI);
-    // Expect the returned URI to be equal to the minted URI
     expect(storedURI).to.equal(tokenURI);
   });
 });
+
