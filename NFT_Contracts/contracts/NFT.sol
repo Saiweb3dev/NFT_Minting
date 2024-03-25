@@ -21,4 +21,7 @@ contract NFT is ERC721 {
     ) public view override returns (string memory) {
         return s_tokenIdToUri[tokenId];
     }
+    function getTokenCounter() public view returns(uint){
+        return s_tokenCounter;
+    }
 }
