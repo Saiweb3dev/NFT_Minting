@@ -1,11 +1,23 @@
 import hre from "hardhat";
 import { developmentChains, networkConfig } from "../helper-hardhat-config";
-import { storeImage } from "../utils/uploadToPinata";
+import { storeImage, storeTokenUriMetaData } from "../utils/uploadToPinata";
+
+const metaDataTemplate = {
+  name: "",
+  description:"",
+  image:"",
+  attributes:[
+    {
+      trait_type: "Cuteness",
+      value: "100",
+    }
+  ]
+}
+let tokenUris:any;
 async function main() {
   const chainId : number | undefined = hre.network.config.chainId;
   let VRFCoordinatorV2Address,subscriptionId;
-  let tokenUris;
-   const imagesLocation = "./Image"
+  
 
   if(process.env.UPLOAD_TO_PINATA == "true"){
     tokenUris = await handleTokenUris()
@@ -40,7 +52,7 @@ if (txReceipt) {
   }
 
   console.log("----------------------------");
-  await storeImage(imagesLocation)
+  
 //   const args = [VRFCoordinatorV2Address,subscriptionId,networkConfig[chainId].gasLane,networkConfig[chainId].mintFee,networkConfig[chainId].callbackGasLimit,
  
 // ]
@@ -56,6 +68,30 @@ if (txReceipt) {
 
 const handleTokenUris = async () => {
   tokenUris = []
+  const imagesLocation = "./Image"
+  const {responses:imageUploadResponses,files} = await storeImage(imagesLocation)
+  console.log("HandleTokenURI function Running ....")
+  for(let imageUploadResponseIndex in imageUploadResponses){
+    console.log("----------------------------");
+    console.log(`Working on ${imageUploadResponseIndex}.....`)
+    let tokenUriMetadata = {...metaDataTemplate}
+    tokenUriMetadata.name = files[imageUploadResponseIndex].replace(".png","")
+    tokenUriMetadata.description = `An Adorable NFT Dog`
+    tokenUriMetadata.image = `ipfs://${imageUploadResponses[imageUploadResponseIndex].IpfsHash}`
+    console.log(`Uploading Metadata for ${tokenUriMetadata.name}....`);
+    const metadataUploadResponse = await storeTokenUriMetaData(tokenUriMetadata)
+    if(metadataUploadResponse == null) {
+      console.log("Could not upload metadata for ", tokenUriMetadata.name);
+      console.log("----------------------------");
+      process.exit(1);
+    }
+    tokenUris.push(`ipfs://${metadataUploadResponse.IpfsHash}`)
+    console.log("----------------------------");
+  }
+  console.log("Token URIs Uploaded!!!!. They are :")
+  console.log(tokenUris)
+  console.log("----------------------------");
+  return tokenUris
 }
 
 main().catch((error) => {
